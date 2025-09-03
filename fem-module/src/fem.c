@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include "fem.h"
+#include "mtrx_fill.h"
 
 // Функция формирования локальной матрицы жесткости
 void beamElement(double len_elem, double area, double e, double puas,\
@@ -68,7 +70,7 @@ void beamElement(double len_elem, double area, double e, double puas,\
 }
 
 // сборка глобальной матрицы жесткости
-void assemblyGlobalMtrx(int ndof, int ndofysla, int iys1, \
+void assemblyGlobalMtrx(int ndofysla, int iys1, \
                         int iys2, double **gest, double **kglb) {
     int ig, jg, il, jl;  // начальные позиции в лок. и глоб. матрицах
     int iblock, jblock;    // добавочные коэф. к позициям матриц
@@ -96,7 +98,7 @@ void assemblyGlobalMtrx(int ndof, int ndofysla, int iys1, \
     free(nys);
 }
 
-bool_t assembleLocalStiffnessToGlobal(int ndof, int ndofysla, double area, double aiy,\
+bool_t assembleLocalStiffnessToGlobal(int ndofysla, double area, double aiy,\
                                     double aiz, double aik, double e, double puas, int nelem,\
                                     int **jt02, double **coords, double **kglb) {
     bool_t error = FALSE;
@@ -116,10 +118,10 @@ bool_t assembleLocalStiffnessToGlobal(int ndof, int ndofysla, double area, doubl
                         coords[1][iys2 - 1], coords[2][iys2 - 1]};
 
             double beam_len = sqrt(pow(node1.x - node2.x, 2.) +\
-                            pow(node1.y - node2.y, 2.) + pow(node1.z - node2.z));
+                            pow(node1.y - node2.y, 2.) + pow(node1.z - node2.z, 2.));
 
             beamElement(beam_len, area, e, puas, aiy, aiz, aik, gest);
-            assemblyGlobalMtrx(ndof, ndofysla, node1.iys, node2.iys, gest, kglb);
+            assemblyGlobalMtrx(ndofysla, node1.iys, node2.iys, gest, kglb);
         }
     }
 

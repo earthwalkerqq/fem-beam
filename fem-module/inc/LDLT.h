@@ -1,5 +1,5 @@
 #ifndef LDLT_H
-#define LDLT_T
+#define LDLT_H
 
 #include "fem.h"
 

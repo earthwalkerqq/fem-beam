@@ -1,3 +1,6 @@
+#include <math.h>
+#include <stdio.h>
+
 #include "LDLT.h"
 
 // разложение матрицы глобальной матрицы жесткости kglb[ndof][ndof] в LDLT
@@ -93,11 +96,16 @@ void rechLDLT(int ndof, double **kglb, double *u, double *x) {
 
 bool_t solveLinearSystemLDLT(double **kglb, double *u, double *r, double *x, int ndof) {
     bool_t error = matrLDLT(ndof, kglb);
-    if (!ierr) {
+    if (!error) {
         direktLDLT(ndof, kglb, x, r);
-        ierr = diagLDLT(ndof, kglb, x);
-        if (!ierr)
+        error = diagLDLT(ndof, kglb, x);
+        if (!error)
             rechLDLT(ndof, kglb, u, x);
+        else {
+            perror("Error in solution");
+        }
+    } else {
+        perror("It's impossible to decompose the stiffness matrix");
     }
-  return ierr;
+  return error;
 }

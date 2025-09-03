@@ -4,8 +4,8 @@
 
 #include "mtrx_fill.h"
 
-char make_double_mtrx(double ***mtrx, int row, int col) {
-    char error = FALSE;
+bool_t make_double_mtrx(double ***mtrx, int row, int col) {
+    bool_t error = FALSE;
 
     double *data = (double*)malloc(row * col * sizeof(double));
     if (!data) {
@@ -23,14 +23,33 @@ char make_double_mtrx(double ***mtrx, int row, int col) {
     return error;
 }
 
-char make_null_double_mtrx(double ***mtrx, int row, int col) {
-    char error = FALSE;
+bool_t make_int_mtrx(int ***mtrx, int row, int col) {
+    bool_t error = FALSE;
 
-    double *data = (double*)calloc(row * col * sizeof(double));
+    int *data = (int*)malloc(row * col * sizeof(int));
     if (!data) {
         error = TRUE;
     } else {
-        *mtrx = (double**)calloc(row * sizeof(double*));
+        *mtrx = (int**)malloc(row * sizeof(int*));
+        if (!*mtrx) {
+            error = TRUE;
+            free(data);
+        } else {
+            for (int i = 0; i < row; i++) (*mtrx)[i] = data + i * col;
+        }
+    }
+    
+    return error;
+}
+
+bool_t make_null_double_mtrx(double ***mtrx, int row, int col) {
+    bool_t error = FALSE;
+
+    double *data = (double*)calloc(row * col, sizeof(double));
+    if (!data) {
+        error = TRUE;
+    } else {
+        *mtrx = (double**)calloc(row, sizeof(double*));
         if (!*mtrx) {
             error = TRUE;
             free(data);
@@ -53,36 +72,8 @@ void destroy_mtrxs(int count_elem, ...) {
     va_end(list);
 }
 
-char read_fem_data(char *filename, int *nys, int *nelem, double ***coords, int ***jt02) {
-    char error = FALSE;
-
-    FILE *file = fopen(filename, "r");
-    if (!file || fscanf(file, "%d", nys) != 1 || *nys <= 0 || make_double_mtrx(coords, 3, *nys)) {
-        error = TRUE;
-    } else {
-        for (int i = 0; i < *nys && !error; i++) {
-            if (fscanf(file, "%lf%lf%lf", (*coords)[0] + i, (*coords)[1] + i, (*coords)[2] + i) != 3) error = TRUE;
-        }
-        if (!error || fscanf(file, "%d", nelem) != 1 || make_double_mtrx(jt02, 2, *nelem)) {
-            error = TRUE;
-            destroy_mtrx(coords);
-        } else {
-            for (int i = 0; i < *nelem && !error; i++) {
-                if (fscanf(file, "%d%d", (*jt02)[0] + i, (*jt02)[1] + i) != 2) error = TRUE;
-            }
-
-            if (error) {
-                destroy_mtrx(coords);
-                destroy_mtrx(jt02);
-            }
-        }
-    }
-    fclose(file);
-    return error;
-}
-
-char make_double_arr(double **arr, int size) {
-    char error = FALSE;
+bool_t make_double_arr(double **arr, int size) {
+    bool_t error = FALSE;
 
     *arr = (double*)malloc(size * sizeof(double));
     if (!*arr)
@@ -91,8 +82,8 @@ char make_double_arr(double **arr, int size) {
     return error;
 }
 
-char make_work_arrs(int count_elem, int size, ...) {
-    char error = FALSE;
+bool_t make_work_arrs(int size, int count_elem, ...) {
+    bool_t error = FALSE;
 
     double **arr_pull = (double**)malloc(count_elem * sizeof(double*));
 
@@ -119,8 +110,8 @@ char make_work_arrs(int count_elem, int size, ...) {
     return error;
 }
 
-char make_arr(int **arr, int size) {
-    char error = FALSE;
+bool_t make_arr(int **arr, int size) {
+    bool_t error = FALSE;
 
     *arr = (int*)malloc(size * sizeof(int));
     if (!*arr) {

@@ -22,12 +22,9 @@ extern const double diam; // диаметр круглого поперечно�
 
 void beamElement(double len_elem, double area, double e, double puas, double aiy, double aiz, double aik, double **gest);
 
-void assemblyGlobalMtrx(int ndof, int ndofysla, int iys1, int iys2, double **gest, double **kglb);
-bool_t assembleLocalStiffnessToGlobal(int ndof, int ndofysla, double area, double aiy,\
+void assemblyGlobalMtrx(int ndofysla, int iys1, int iys2, double **gest, double **kglb);
+bool_t assembleLocalStiffnessToGlobal(int ndofysla, double area, double aiy,\
                                     double aiz, double aik, double e, double puas, int nelem,\
-                                    int **jt02, double **coords, double **kglb)
-
-void set_loads(int ndofysla, int count_node_load, int *nodesUnderLoad, double *r);
-void set_fixed(int ndofysla, int count_node_fixed, int *nodesFixed, double **kglb);
+                                    int **jt02, double **coords, double **kglb);
 
 #endif
